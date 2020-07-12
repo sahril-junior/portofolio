@@ -1,37 +1,42 @@
-$mail = new PHPMailer;
+<?php
+  /**
+  * Requires the "PHP Email Form" library
+  * The "PHP Email Form" library is available only in the pro version of the template
+  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
+  * For more info and help: https://bootstrapmade.com/php-email-form/
+  */
 
-//$mail->SMTPDebug = 3;                               // Enable verbose debug output
+  // Replace contact@example.com with your real receiving email address
+  $receiving_email_address = 'apps.sahril@gmail.com';
 
-$mail->isSMTP();                                      // Set mailer to use SMTP
-$mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-$mail->SMTPAuth = true;                               // Enable SMTP authentication
-$mail->Username = 'apps.sahril@gmail.com';                 // SMTP username
-$mail->Password = 'sahril0210';                           // SMTP password
-$mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
-$mail->Port = 587;                                    // TCP port to connect to
+  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
+    include( $php_email_form );
+  } else {
+    die( 'Unable to load the "PHP Email Form" Library!');
+  }
 
-$mail->setFrom('web.sahril@gmail.com', 'Mailer');
-$mail->addAddress('sakib.cse11.cuet@gmail.com', 'Sakib Rahman');     // Add a recipient
-               // Name is optional
-$mail->addReplyTo('info@example.com', 'Information');
-// $mail->addCC('cc@example.com');
-// $mail->addBCC('bcc@example.com');
+  $contact = new PHP_Email_Form;
+  $contact->ajax = true;
+  
+  $contact->to = $receiving_email_address;
+  $contact->from_name = $_POST['name'];
+  $contact->from_email = $_POST['email'];
+  $contact->subject = $_POST['subject'];
 
-// $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-// $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-$mail->isHTML(true);                                  // Set email format to HTML
+  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
+  /*
+  $contact->smtp = array(
+    'host' => 'smtp.gmail.com',
+    'username' => 'apps.sahril@gmail.com',
+    'password' => 'sahril0210',
+    'port' => '587'
+  );
+  */
 
-$mail->from_name = $_POST['name'];
-$mail->from_email = $_POST['email'];
-$mail->subject = $_POST['subject'];
+  $contact->add_message( $_POST['name'], 'From');
+  $contact->add_message( $_POST['email'], 'Email');
+  $contact->add_message( $_POST['message'], 'Message', 10);
 
-$mail->add_message( $_POST['name'], 'From');
-$mail->dd_message( $_POST['email'], 'Email');
-$mail->add_message( $_POST['message'], 'Message', 10);
+  echo $contact->send();
+?>
 
-if(!$mail->send()) {
-    echo 'Message could not be sent.';
-    echo 'Mailer Error: ' . $mail->ErrorInfo;
-} else {
-    echo 'Message has been sent';
-}
